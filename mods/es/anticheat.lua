@@ -14,6 +14,15 @@ es = {}
 
 
 
+--rnd no sneak
+--overridephysics({sneak= false})
+minetest.register_on_joinplayer(function(player)
+ player:set_physics_override({sneak=false})
+end)
+
+
+
+
 -- rnd: anti noclip cheat
 local clip_nodes = {["default:stone"]=1,["default:cobble"]=1,["default:stonebrick"]=1,["default:dirt"]=1,["default:glass"]=1,["default:dirt"]=1,["default:steelblock"]=1}
 local time =0;
