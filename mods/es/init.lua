@@ -37,7 +37,7 @@ dofile(modpath.."/crafting.lua")
 dofile(modpath.."/shutdown.lua")
 
 --Spawn
---dofile(modpath.."/spawn.lua")
+dofile(modpath.."/spawn.lua")
 
 -- Nodes
 dofile(modpath.."/nodes.lua")
