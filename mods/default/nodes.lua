@@ -172,7 +172,7 @@ default:nyancat_rainbow
 minetest.register_node("default:stone", {
 	description = "Stone",
 	tiles = {"default_stone.png"},
-	groups = {cracky = 3, stone = 1},
+	groups = {cracky = 3,soil = 1},
 	drop = 'default:cobble',
 	legacy_mineral = true,
 	sounds = default.node_sound_stone_defaults(),
@@ -698,6 +698,14 @@ minetest.register_node("default:stone_with_coal", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+--[[minetest.register_node("default:desert_stone_with_coal", {
+	description = "Coal Ore",
+	tiles = {"default_desert_stone.png^default_mineral_coal.png"},
+	groups = {cracky = 3},
+	drop = 'default:coal_lump',
+	sounds = default.node_sound_stone_defaults(),
+})]]
+
 minetest.register_node("default:coalblock", {
 	description = "Coal Block",
 	tiles = {"default_coal_block.png"},
@@ -714,6 +722,14 @@ minetest.register_node("default:stone_with_iron", {
 	drop = 'default:iron_lump',
 	sounds = default.node_sound_stone_defaults(),
 })
+
+--[[minetest.register_node("default:desert_stone_with_iron", {
+	description = "Iron Ore",
+	tiles = {"default_desert_stone.png^default_mineral_iron.png"},
+	groups = {cracky = 2},
+	drop = 'default:iron_lump',
+	sounds = default.node_sound_stone_defaults(),
+})]]
 
 minetest.register_node("default:steelblock", {
 	description = "Steel Block",
@@ -747,18 +763,18 @@ minetest.register_node("default:bronzeblock", {
 	groups = {cracky = 1, level = 2},
 	sounds = default.node_sound_stone_defaults(),
 })
-
---[[
+--ES OVERRIDE
+--[[changed for cooking
 minetest.register_node("default:stone_with_mese", {
-	description = "Mese Ore",
-	tiles = {"default_stone.png^default_mineral_mese.png"},
+	description = "Cookable Mese Ore",
+	tiles = {"default_stone.png^mese_cook_mese_crystal.png^default_mineral_mese.png"},
 	paramtype = "light",
 	groups = {cracky = 1},
-	drop = "default:mese_crystal",
+	drop = "es:mesecook_crystal",
 	sounds = default.node_sound_stone_defaults(),
 	light_source = 1,
-})
-]]
+})]]
+
 minetest.register_node("default:mese", {
 	description = "Mese Block",
 	tiles = {"default_mese_block.png"},
@@ -776,6 +792,15 @@ minetest.register_node("default:stone_with_gold", {
 	drop = "default:gold_lump",
 	sounds = default.node_sound_stone_defaults(),
 })
+
+--[[minetest.register_node("default:desert_stone_with_gold", {
+	description = "Gold Ore",
+	tiles = {"default_desert_stone.png^default_mineral_gold.png"},
+	groups = {cracky = 2},
+	drop = "default:gold_lump",
+	sounds = default.node_sound_stone_defaults(),
+})]]
+
 
 minetest.register_node("default:goldblock", {
 	description = "Gold Block",
@@ -807,11 +832,11 @@ minetest.register_node("default:diamondblock", {
 --
 
 minetest.register_node("default:cactus", {
-	description = "Cactus",
+	description = "Cactus - Death on impact",
 	tiles = {"default_cactus_top.png", "default_cactus_top.png",
 		"default_cactus_side.png"},
 	paramtype2 = "facedir",
-	groups = {snappy = 1, choppy = 3, flammable = 2},
+	groups = {snappy = 1, choppy = 3, flammable = 2, fall_damage_add_percent = 1000},
 	sounds = default.node_sound_wood_defaults(),
 	on_place = minetest.rotate_node,
 
