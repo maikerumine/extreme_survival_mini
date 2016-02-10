@@ -55,9 +55,23 @@ minetest.register_on_newplayer(function(player)
 		minetest.log("action", "Giving initial stuff to player "..player:get_player_name())
 		player:get_inventory():add_item('main', 'default:sword_mese 1')
 		player:get_inventory():add_item('main', 'default:torch 55')
-		player:get_inventory():add_item('main', 'default:pick_stone 1')
+		player:get_inventory():add_item('main', 'shooter:rifle 1')
 		player:get_inventory():add_item('main', 'default:pick_steel 1')
 		player:get_inventory():add_item('main', 'default:sapling 1')
 		player:get_inventory():add_item('main', 'default:wood 3')
 		player:get_inventory():add_item('main', 'farming:bread 60')
+		player:get_inventory():add_item('main', 'shooter:ammo 6')
 end)
+
+--disable sneak on player join to make more interesting mining
+
+--Sent: 31 Jan 2016, 10:53
+--From: rnd
+--To: maikerumine 
+--to make stuff happen when player joins ( in this case disable sneak) add somewhere
+--in some init.lua ( doesnt really matter which one, for sake of order put in your mod in visible place)
+-----------------------------------------
+minetest.register_on_joinplayer(function(player)
+player:set_physics_override({sneak=false})
+end)
+--------------------------------------------------
