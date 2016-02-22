@@ -10,6 +10,57 @@
 mobs = {}
 mobs.mod = "redo"
 
+--minetest.register_alias("esmobs:dirt", "default:gravel")
+--minetest.register_alias("esmobs:stone", "default:gravel")
+--[[
+-- rnd: special stone that disappears after 30 seconds, used by mobs
+minetest.register_node("esmobs:stone", {
+	description = "Stone",
+	tiles = {"default_stone.png"},
+	groups = {cracky=3, stone=1},
+	drop = 'default:cobble',
+	legacy_mineral = true,
+	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		minetest.after(30, function()
+			minetest.set_node(pos, {name = "air"})
+		end)
+	end
+})
+
+minetest.register_node("esmobs:dirt", {
+	description = "Dirt",
+	tiles = {"default_dirt.png"},
+	groups = {crumbly=2, dirt=1},
+	drop = 'default:dirt',
+	legacy_mineral = true,
+	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		minetest.after(30, function()
+			minetest.set_node(pos, {name = "air"})
+		end)
+	end
+})
+]]
+
+-- maikerumine: special stone that disappears after 30 seconds, used by mobs
+minetest.register_node("esmobs:stone", {
+	description = "Stone",
+	tiles = {"default_stone.png"},
+	is_ground_content = false,
+	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+})
+
+minetest.register_node("esmobs:dirt", {
+	description = "Dirt",
+	tiles = {"default_dirt.png"},
+	is_ground_content = false,
+	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+})
+
+
+
+
 -- Load settings
 local damage_enabled = minetest.setting_getbool("enable_damage")
 local peaceful_only = minetest.setting_getbool("only_peaceful_mobs")
@@ -20,8 +71,8 @@ local remove_far = minetest.setting_getbool("remove_far_mobs")
 -- PATHFINDING settings
 local enable_pathfinding = true
 local enable_pathfind_digging = true
-local stuck_timeout = 5 -- how long before mob gets stuck in place and starts searching
-local stuck_path_timeout = 15 -- how long will mob follow path before giving up
+local stuck_timeout = 12 -- how long before mob gets stuck in place and starts searching
+local stuck_path_timeout = 25 -- how long will mob follow path before giving up
 
 --bones settings  maikerumine bones code
 local enable_mob_bones = true
@@ -699,6 +750,162 @@ function day_docile(self)
 	end
 end
 
+-- path finding and smart mob routine by rnd
+function smart_mobs(self, s, p, dtime)
+
+	local s1 = self.path.lastpos
+
+	-- is it becoming stuck?
+	if math.abs(s1.x - s.x) + math.abs(s1.z - s.z) < 1.5 then
+		self.path.stuck_timer = self.path.stuck_timer + dtime
+	else
+		self.path.stuck_timer = 0
+	end
+
+	self.path.lastpos = {x = s.x, y = s.y, z = s.z}
+
+	-- im stuck, search for path
+	if (self.path.stuck_timer > stuck_timeout and not self.path.following)
+	or (self.path.stuck_timer > stuck_path_timeout
+	and self.path.following) then
+
+		self.path.stuck_timer = 0
+
+		-- lets try find a path, first take care of positions
+		-- since pathfinder is very sensitive
+		local sheight = self.collisionbox[5] - self.collisionbox[2]
+
+		-- round position to center of node to avoid stuck in walls
+		-- also adjust height for player models!
+		s.x = math.floor(s.x + 0.5)
+		s.y = math.floor(s.y + 0.5) - sheight
+		s.z = math.floor(s.z + 0.5)
+
+		local ssight, sground
+		ssight, sground = minetest.line_of_sight(s, {
+			x = s.x, y = s.y - 4, z = s.z}, 1)
+
+		-- determine node above ground
+		if not ssight then
+			s.y = sground.y + 1
+		end
+
+		local p1 = self.attack:getpos()
+
+		p1.x = math.floor(p1.x + 0.5)
+		p1.y = math.floor(p1.y + 0.5)
+		p1.z = math.floor(p1.z + 0.5)
+
+		self.path.way = minetest.find_path(s, p1, 16, 2, 6, "Dijkstra") --"A*_noprefetch"
+
+		-- attempt to unstuck mob that is "daydreaming"
+		self.object:setpos({x=s.x+0.1*(math.random()*2-1),y=s.y+1,z=s.z+0.1*(math.random()*2-1)}) -- try to unstuck position
+		self.state = ""
+		do_attack(self, self.attack)
+
+		-- no path found, try something else
+		if not self.path.way then
+
+			self.path.following = false
+
+			 -- lets make way by digging/building if not accessible
+			if enable_pathfind_digging then
+
+				 -- add block and remove one block above so
+				 -- there is room to jump if needed
+				if s.y < p1.y then
+
+					if not minetest.is_protected(s, "") then
+						minetest.set_node(s, {name = "esmobs:stone"})
+					end
+
+					local sheight = math.ceil(self.collisionbox[5]) + 1
+
+					-- assume mob is 2 blocks high so it digs above its head
+					s.y = s.y + sheight
+
+					if not minetest.is_protected(s, "") then
+
+						local node1 = minetest.get_node(s).name
+
+						if node1 ~= "air"
+						and node1 ~= "ignore" then
+							minetest.set_node(s, {name = "air"})
+							minetest.add_item(s, ItemStack(node1))
+						end
+					end
+
+					s.y = s.y - sheight
+					self.object:setpos({x = s.x, y = s.y + 2, z = s.z})
+
+				else -- dig 2 blocks to make door toward player direction
+
+					local yaw = self.object:getyaw()+ pi / 2
+
+					local p1 = {
+						x = s.x + math.cos(yaw),
+						y = s.y,
+						z = s.z + math.sin(yaw)
+					}
+
+					if not minetest.is_protected(p1, "") then
+
+						local node1 = minetest.get_node(p1).name
+
+						if node1 ~= "air"
+						and node1 ~= "ignore" then
+							minetest.add_item(p1, ItemStack(node1))
+							minetest.set_node(p1, {name = "air"})
+						end
+
+						p1.y = p1.y + 1
+						node1 = minetest.get_node(p1).name
+
+						if node1 ~= "air"
+						and node1 ~= "ignore" then
+							minetest.add_item(p1, ItemStack(node1))
+							minetest.set_node(p1, {name = "air"})
+						end
+
+					end
+				end
+			end
+
+			-- will try again in 2 seconds
+			self.path.stuck_timer = stuck_timeout - 2
+
+			-- frustration! cant find the damn path :(
+			if self.sounds.random then
+				minetest.sound_play(self.sounds.random, {
+					object = self.object,
+					max_hear_distance = self.sounds.distance
+				})
+			end
+
+		else
+
+			-- yay i found path
+			if self.sounds.attack then
+
+				set_velocity(self, self.walk_velocity)
+
+				minetest.sound_play(self.sounds.attack, {
+					object = self.object,
+					max_hear_distance = self.sounds.distance
+				})
+			end
+
+			-- follow path now that it has it
+			self.path.following = true
+		end
+
+	end
+end
+
+
+
+
+
 -- register mob function
 function mobs:register_mob(name, def)
 
@@ -736,7 +943,7 @@ minetest.register_entity(name, {
 	water_damage = def.water_damage or 0,
 	lava_damage = def.lava_damage or 0,
 	fall_damage = def.fall_damage or 1,
-	fall_speed = def.fall_speed or -10, -- must be lower than -2 (default: -10)
+	fall_speed = def.fall_speed or -12, -- must be lower than -2 (default: -10)
 	drops = def.drops or {},
 	armor = def.armor,
 	on_rightclick = def.on_rightclick,
@@ -1479,11 +1686,133 @@ minetest.register_entity(name, {
 
 			end
 
-			-- rnd: new movement direction
 
-			if self.path.stuck and self.path.way then
-				if #self.path.way>50 or dist<self.reach then self.path.stuck = false return end -- no paths longer than 50
-				local p1 = self.path.way[1]; if not p1 then self.path.stuck = false return end
+				-- rnd: new movement direction
+
+			if self.path.following
+			and self.path.way
+			and self.attack_type ~= "dogshoot" then
+
+				-- no paths longer than 50
+				if #self.path.way > 50
+				or dist < self.reach then
+					self.path.following = false
+					return
+				end
+
+				local p1 = self.path.way[1]
+
+				if not p1 then
+					self.path.following = false
+					return
+				end
+
+				if math.abs(p1.x-s.x) + math.abs(p1.z - s.z) < 0.6 then
+					-- reached waypoint, remove it from queue
+					table.remove(self.path.way, 1)
+				end
+
+				-- set new temporary target
+				p = {x = p1.x, y = p1.y, z = p1.z}
+			end
+
+			local vec = {
+				x = p.x - s.x,
+				y = p.y - s.y,
+				z = p.z - s.z
+			}
+
+			if vec.x ~= 0
+			and vec.z ~= 0 then
+
+				yaw = (math.atan(vec.z / vec.x) + pi / 2) - self.rotate
+
+				if p.x > s.x then
+					yaw = yaw + pi
+				end
+
+				self.object:setyaw(yaw)
+			end
+
+			-- move towards enemy if beyond mob reach
+			if dist > self.reach then
+
+				-- path finding by rnd
+				if enable_pathfinding then
+					smart_mobs(self, s, p, dtime)
+				end
+
+				-- jump attack
+				if (self.jump
+				and get_velocity(self) <= 0.5
+				and self.object:getvelocity().y == 0)
+				or (self.object:getvelocity().y == 0
+				and self.jump_chance > 0) then
+
+					do_jump(self)
+				end
+
+				if is_at_cliff(self) then
+
+					set_velocity(self, 0)
+					set_animation(self, "stand")
+				else
+
+					if self.path.following then
+						set_velocity(self, self.walk_velocity)
+					else
+						set_velocity(self, self.run_velocity)
+					end
+
+					set_animation(self, "run")
+				end
+
+			else -- rnd: if inside reach range
+
+				self.path.stuck_timer = 0
+				self.path.following = false -- not stuck anymore
+
+				set_velocity(self, 0)
+				set_animation(self, "punch")
+
+				if self.timer > 1 then
+
+					self.timer = 0
+
+					local p2 = p
+					local s2 = s
+
+					p2.y = p2.y + 1.5
+					s2.y = s2.y + 1.5
+
+					if minetest.line_of_sight(p2, s2) == true then
+
+						-- play attack sound
+						if self.sounds.attack then
+
+							minetest.sound_play(self.sounds.attack, {
+								object = self.object,
+								max_hear_distance = self.sounds.distance
+							})
+						end
+
+						-- punch player
+						self.attack:punch(self.object, 1.0, {
+							full_punch_interval = 1.0,
+							damage_groups = {fleshy = self.damage}
+						}, nil)
+					end
+				end
+			end
+
+
+
+
+
+			-- rnd: following path
+			if self.path.following and self.path.way then
+				if #self.path.way>50 or dist<self.reach then self.path.following = false return end -- no paths longer than 50
+				local p1 = self.path.way[1]; if not p1 then self.path.following = false return end
 				if math.abs(p1.x-s.x)+math.abs(p1.z-s.z)<0.6 then -- reached waypoint, remove it from queue
 					table.remove(self.path.way,1);
 				end
@@ -1519,30 +1848,38 @@ minetest.register_entity(name, {
 					else self.path.stuck_timer = 0;
 					end
 					self.path.lastpos = {x=s.x,y=s.y,z=s.z};
-					if (self.path.stuck_timer>stuck_timeout and not self.path.stuck) or (self.path.stuck_timer>stuck_path_timeout and self.path.stuck) then -- im stuck, search for path
-						self.path.stuck = true;
+
+					if (self.path.stuck_timer>stuck_timeout) or (self.path.stuck_timer>stuck_path_timeout and self.path.following) then -- im stuck, search for path
+
+						self.path.stuck_timer = 0;
+
+						-- lets try find a path, first take care of positions since pathfinder is very sensitive
 						local sheight=self.collisionbox[5]-self.collisionbox[2];
 						s.x=math.floor(s.x+0.5);s.y=math.floor(s.y+0.5)-sheight;s.z=math.floor(s.z+0.5); -- round position to center of node to avoid stuck in walls, also adjust height for player models!
 						local ssight,sground;ssight,sground=minetest.line_of_sight(s, {x=s.x,y=s.y-4,z=s.z}, 1); if not ssight then s.y=sground.y+1	end-- determine node above ground
-
-						--minetest.chat_send_all("stuck at " .. s.x .." " .. s.y .. " " .. s.z .. ", calculating path")
 						local p1 = self.attack:getpos();p1.x=math.floor(p1.x+0.5);p1.y=math.floor(p1.y+0.5);p1.z=math.floor(p1.z+0.5);
 						--minetest.find_path(pos1, pos2, searchdistance, max_jump, max_drop, algorithm)
 						self.path.way = minetest.find_path(s, p1, 16, 2, 6,"Dijkstra"); --"A*_noprefetch");
+
 						if not self.path.way then -- no path found, try something else
-							self.path.stuck=false
-							if enable_pathfind_digging and self.path.stuck_timer>1 then -- lets make way by digging/building if not accessible
+							self.path.following=false;
+							self.path.stuck = true;
+
+							if enable_pathfind_digging then -- lets make way by digging/building if not accessible
+
 								if s.y<p.y then -- add block and remove one block above so there is room to jump if needed
 									if not minetest.is_protected(s,"") then	minetest.set_node(s,{name="esmobs:stone"}); end
-										local sheight=math.ceil(self.collisionbox[5])+1;
-										s.y=s.y+sheight; -- assume mob is 2 blocks high so it digs above its head
-										if not minetest.is_protected(s,"") then
-											local node1=minetest.get_node(s).name;
-											if node1~="air" then minetest.set_node(s,{name="air"});minetest.add_item(s,ItemStack(node1)) end
-										end
-										s.y=s.y-sheight;self.object:setpos({x=s.x,y=s.y+2,z=s.z});
-									else
-										local yaw1= self.object:getyaw()+pi/2; -- dig 2 blocks to make door toward player direction
+									local sheight=math.ceil(self.collisionbox[5])+1;
+									s.y=s.y+sheight; -- assume mob is 2 blocks high so it digs above its head
+									if not minetest.is_protected(s,"") then
+										local node1=minetest.get_node(s).name;
+										if node1~="air" then minetest.set_node(s,{name="air"});minetest.add_item(s,ItemStack(node1)) end
+									end
+									s.y=s.y-sheight;self.object:setpos({x=s.x,y=s.y+2,z=s.z});
+
+								else-- dig 2 blocks to make door toward player direction
+
+								local yaw1= self.object:getyaw()+pi/2;
 										local p1 = {x=s.x+math.cos(yaw1),y=s.y,z=s.z+math.sin(yaw1)};
 										if not minetest.is_protected(p1,"") then
 											local node1=minetest.get_node(p1).name;
@@ -1553,22 +1890,24 @@ minetest.register_entity(name, {
 										end
 								end
 							end
+
+							self.path.stuck_timer=stuck_timeout-1; -- will try again in 1 second
 							minetest.sound_play(self.sounds.random, { -- frustration! cant find the damn path:(
 								object = self.object,
 								max_hear_distance = self.sounds.distance
 							})
-							else
-								if self.sounds.random then -- yay i found path
-									set_velocity(self, self.walk_velocity)
-									minetest.sound_play(self.sounds.attack, {
-										object = self.object,
-										max_hear_distance = self.sounds.distance
-									})
-								end
-							--minetest.chat_send_all("found path with length " .. #self.path.way);
-						self.state = "stand"
+
+						else
+
+							if self.sounds.random then -- yay i found path
+								set_velocity(self, self.walk_velocity)
+								minetest.sound_play(self.sounds.attack, {
+									object = self.object,
+									max_hear_distance = self.sounds.distance
+								})
+							end
+							self.path.following=true;-- follow path now that it has it
 						end
-						self.path.stuck_timer=0
 
 					end
 				end
@@ -1597,9 +1936,9 @@ minetest.register_entity(name, {
 					set_animation(self, "run")
 				end
 
-			else
+			else -- rnd: if inside reach range
 
-				self.path.stuck = false; self.path.stuck_timer=0 -- rnd: no more stuck
+				self.path.stuck = false; self.path.stuck_timer=0;self.path.following=false; -- rnd: no more stuck
 				set_velocity(self, 0)
 				set_animation(self, "punch")
 
@@ -1699,6 +2038,7 @@ minetest.register_entity(name, {
 
 		end -- END if self.state == "attack"
 	end,
+
 
 	on_punch = function(self, hitter, tflp, tool_capabilities, dir)
 		--bones for mobs
@@ -1807,7 +2147,7 @@ minetest.register_entity(name, {
 
 			effect(pos, self.blood_amount, self.blood_texture)
 		end
-
+--[[    --YOU WILL BE MISSED BLOCKMEN
 		-- knock back effect
 		if self.knock_back > 0 then
 
@@ -1823,7 +2163,7 @@ minetest.register_entity(name, {
 
 			self.pause_timer = r
 		end
-
+]]
 		-- if skittish then run away
 		if self.runaway == true then
 
@@ -1956,14 +2296,15 @@ minetest.register_entity(name, {
 			self.health = math.random (self.hp_min, self.hp_max)
 		end
 
+
+
 		-- rnd: pathfinding init
-
-		self.path = {};
-		self.path.way = {};-- path to follow, table of positions
-		self.path.lastpos = {x=0,y=0,z=0};
-		self.path.stuck = false;
-		self.path.stuck_timer = 0; -- if stuck for too long search for path, stuck if v.x, v.z has magnitude smaller than 0.25 for too long
-
+		self.path = {}
+		self.path.way = {} -- path to follow, table of positions
+		self.path.lastpos = {x = 0, y = 0, z = 0}
+		self.path.following = false -- currently following path?
+		self.path.stuck_timer = 0 -- if stuck for too long search for path
+		-- end init
 
 		self.object:set_hp(self.health)
 		self.object:set_armor_groups({fleshy = self.armor})
@@ -1979,6 +2320,10 @@ minetest.register_entity(name, {
 		self.object:set_properties(self)
 		update_tag(self)
 	end,
+
+
+
+
 
 	get_staticdata = function(self)
 
@@ -2607,21 +2952,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 end)
 
--- rnd: special stone that disappears after 30 seconds, used by mobs
-minetest.register_node("esmobs:stone", {
-	description = "Stone",
-	tiles = {"default_stone.png"},
-	groups = {cracky=3, stone=1},
-	drop = 'default:cobble',
-	legacy_mineral = true,
-	sounds = default.node_sound_stone_defaults(),
-	on_construct = function(pos)
-		minetest.after(30, function()
-			minetest.set_node(pos, {name = "air"})
-		end)
-	end
-})
---[[
+
+
+
+
+
 		--Brandon Reese code to face pos
 			function mobs:face_pos(self,pos)
 				local s = self.object:getpos()
@@ -2636,7 +2971,7 @@ minetest.register_node("esmobs:stone", {
 				self.object:setyaw(yaw)
 				return yaw
 			end
-]]
+
 			--Reese chat
 			local_chat = function(pos,text,radius)
 				if radius == nil then
