@@ -23,7 +23,7 @@ minetest.register_item(":", {
 
 minetest.register_tool("default:pick_wood", {
 	description = "Wooden Pickaxe",
-	inventory_image = "default_handle_long.png^(default_steelpick.png^[colorize:#663300:152)",
+	inventory_image = "default_tool_woodpick.png",
 	tool_capabilities = {
 		full_punch_interval = 1.2,
 		max_drop_level=0,
@@ -31,12 +31,11 @@ minetest.register_tool("default:pick_wood", {
 			cracky = {times={[3]=1.60}, uses=10, maxlevel=1},
 		},
 		damage_groups = {fleshy=2},
-		groups = {not_in_craft_guide=1},
 	},
 })
 minetest.register_tool("default:pick_stone", {
 	description = "Stone Pickaxe",
-	inventory_image = "default_handle_long.png^(default_steelpick.png^[colorize:#9C9C9C:152)",
+	inventory_image = "default_tool_stonepick.png",
 	tool_capabilities = {
 		full_punch_interval = 1.3,
 		max_drop_level=0,
@@ -48,8 +47,7 @@ minetest.register_tool("default:pick_stone", {
 })
 minetest.register_tool("default:pick_steel", {
 	description = "Steel Pickaxe",
-	--inventory_image = "handle_long.png^[colorize:#FFFFFF:142^(steelpick.png^[colorize:#979797:152)",
-	inventory_image = "default_handle_long.png^(default_steelpick.png^[colorize:#FFFFFF:152)",
+	inventory_image = "default_tool_steelpick.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
@@ -61,7 +59,7 @@ minetest.register_tool("default:pick_steel", {
 })
 minetest.register_tool("default:pick_bronze", {
 	description = "Bronze Pickaxe",
-	inventory_image = "default_handle_long.png^(default_steelpick.png^[colorize:#EAB400:152)",
+	inventory_image = "default_tool_bronzepick.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
@@ -73,7 +71,7 @@ minetest.register_tool("default:pick_bronze", {
 })
 minetest.register_tool("default:pick_mese", {
 	description = "Mese Pickaxe",
-	inventory_image = "default_handle_long.png^(default_steelpick.png^[colorize:#FFFF00:152)",
+	inventory_image = "default_tool_mesepick.png",
 	tool_capabilities = {
 		full_punch_interval = 0.9,
 		max_drop_level=3,
@@ -85,7 +83,7 @@ minetest.register_tool("default:pick_mese", {
 })
 minetest.register_tool("default:pick_diamond", {
 	description = "Diamond Pickaxe",
-	inventory_image = "default_handle_long.png^(default_steelpick.png^[colorize:#33FFFF:152)",
+	inventory_image = "default_tool_diamondpick.png",
 	tool_capabilities = {
 		full_punch_interval = 0.9,
 		max_drop_level=3,
@@ -102,8 +100,8 @@ minetest.register_tool("default:pick_diamond", {
 
 minetest.register_tool("default:shovel_wood", {
 	description = "Wooden Shovel",
-	inventory_image = "default_handle_long.png^(default_steelshovel.png^[colorize:#663300:152)",
-	--wield_image = "default_tool_woodshovel.png^[transformR90",
+	inventory_image = "default_tool_woodshovel.png",
+	wield_image = "default_tool_woodshovel.png^[transformR90",
 	tool_capabilities = {
 		full_punch_interval = 1.2,
 		max_drop_level=0,
@@ -115,8 +113,8 @@ minetest.register_tool("default:shovel_wood", {
 })
 minetest.register_tool("default:shovel_stone", {
 	description = "Stone Shovel",
-	inventory_image = "default_handle_long.png^(default_steelshovel.png^[colorize:#9C9C9C:152)",
-	--wield_image = "default_tool_stoneshovel.png^[transformR90",
+	inventory_image = "default_tool_stoneshovel.png",
+	wield_image = "default_tool_stoneshovel.png^[transformR90",
 	tool_capabilities = {
 		full_punch_interval = 1.4,
 		max_drop_level=0,
@@ -128,8 +126,8 @@ minetest.register_tool("default:shovel_stone", {
 })
 minetest.register_tool("default:shovel_steel", {
 	description = "Steel Shovel",
-	inventory_image = "default_handle_long.png^(default_steelshovel.png^[colorize:#FFFFFF:152)",
-	--wield_image = "default_tool_steelshovel.png^[transformR90",
+	inventory_image = "default_tool_steelshovel.png",
+	wield_image = "default_tool_steelshovel.png^[transformR90",
 	tool_capabilities = {
 		full_punch_interval = 1.1,
 		max_drop_level=1,
@@ -141,8 +139,8 @@ minetest.register_tool("default:shovel_steel", {
 })
 minetest.register_tool("default:shovel_bronze", {
 	description = "Bronze Shovel",
-	inventory_image = "default_handle_long.png^(default_steelshovel.png^[colorize:#EAB400:152)",
-	--wield_image = "default_tool_bronzeshovel.png^[transformR90",
+	inventory_image = "default_tool_bronzeshovel.png",
+	wield_image = "default_tool_bronzeshovel.png^[transformR90",
 	tool_capabilities = {
 		full_punch_interval = 1.1,
 		max_drop_level=1,
@@ -154,8 +152,8 @@ minetest.register_tool("default:shovel_bronze", {
 })
 minetest.register_tool("default:shovel_mese", {
 	description = "Mese Shovel",
-	inventory_image = "default_handle_long.png^(default_steelshovel.png^[colorize:#FFFF00:152)",
-	--wield_image = "default_tool_meseshovel.png^[transformR90",
+	inventory_image = "default_tool_meseshovel.png",
+	wield_image = "default_tool_meseshovel.png^[transformR90",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=3,
@@ -167,8 +165,8 @@ minetest.register_tool("default:shovel_mese", {
 })
 minetest.register_tool("default:shovel_diamond", {
 	description = "Diamond Shovel",
-	inventory_image = "default_handle_long.png^(default_steelshovel.png^[colorize:#33FFFF:152)",
-	--wield_image = "default_tool_diamondshovel.png^[transformR90",
+	inventory_image = "default_tool_diamondshovel.png",
+	wield_image = "default_tool_diamondshovel.png^[transformR90",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
@@ -185,7 +183,7 @@ minetest.register_tool("default:shovel_diamond", {
 
 minetest.register_tool("default:axe_wood", {
 	description = "Wooden Axe",
-	inventory_image = "default_handle_long.png^(default_steelaxe.png^[colorize:#663300:152)",
+	inventory_image = "default_tool_woodaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=0,
@@ -197,7 +195,7 @@ minetest.register_tool("default:axe_wood", {
 })
 minetest.register_tool("default:axe_stone", {
 	description = "Stone Axe",
-	inventory_image = "default_handle_long.png^(default_steelaxe.png^[colorize:#9C9C9C:152)",
+	inventory_image = "default_tool_stoneaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 1.2,
 		max_drop_level=0,
@@ -209,7 +207,7 @@ minetest.register_tool("default:axe_stone", {
 })
 minetest.register_tool("default:axe_steel", {
 	description = "Steel Axe",
-	inventory_image = "default_handle_long.png^(default_steelaxe.png^[colorize:#FFFFFF:152)",
+	inventory_image = "default_tool_steelaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
@@ -221,7 +219,7 @@ minetest.register_tool("default:axe_steel", {
 })
 minetest.register_tool("default:axe_bronze", {
 	description = "Bronze Axe",
-	inventory_image = "default_handle_long.png^(default_steelaxe.png^[colorize:#EAB400:152)",
+	inventory_image = "default_tool_bronzeaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
@@ -233,7 +231,7 @@ minetest.register_tool("default:axe_bronze", {
 })
 minetest.register_tool("default:axe_mese", {
 	description = "Mese Axe",
-	inventory_image = "default_handle_long.png^(default_steelaxe.png^[colorize:#FFFF00:152)",
+	inventory_image = "default_tool_meseaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 0.9,
 		max_drop_level=1,
@@ -245,7 +243,7 @@ minetest.register_tool("default:axe_mese", {
 })
 minetest.register_tool("default:axe_diamond", {
 	description = "Diamond Axe",
-	inventory_image = "default_handle_long.png^(default_steelaxe.png^[colorize:#33FFFF:152)",
+	inventory_image = "default_tool_diamondaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 0.9,
 		max_drop_level=1,
@@ -262,7 +260,7 @@ minetest.register_tool("default:axe_diamond", {
 
 minetest.register_tool("default:sword_wood", {
 	description = "Wooden Sword",
-	inventory_image = "default_handle_short.png^(default_steelsword.png^[colorize:#663300:152)",
+	inventory_image = "default_tool_woodsword.png",
 	tool_capabilities = {
 		full_punch_interval = 1,
 		max_drop_level=0,
@@ -274,7 +272,7 @@ minetest.register_tool("default:sword_wood", {
 })
 minetest.register_tool("default:sword_stone", {
 	description = "Stone Sword",
-	inventory_image = "default_handle_short.png^(default_steelsword.png^[colorize:#9C9C9C:152)",
+	inventory_image = "default_tool_stonesword.png",
 	tool_capabilities = {
 		full_punch_interval = 1.2,
 		max_drop_level=0,
@@ -286,7 +284,7 @@ minetest.register_tool("default:sword_stone", {
 })
 minetest.register_tool("default:sword_steel", {
 	description = "Steel Sword",
-	inventory_image = "default_handle_short.png^(default_steelsword.png^[colorize:#FFFFFF:152)",
+	inventory_image = "default_tool_steelsword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.8,
 		max_drop_level=1,
@@ -298,7 +296,7 @@ minetest.register_tool("default:sword_steel", {
 })
 minetest.register_tool("default:sword_bronze", {
 	description = "Bronze Sword",
-	inventory_image = "default_handle_short.png^(default_steelsword.png^[colorize:#EAB400:152)",
+	inventory_image = "default_tool_bronzesword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.8,
 		max_drop_level=1,
@@ -310,7 +308,7 @@ minetest.register_tool("default:sword_bronze", {
 })
 minetest.register_tool("default:sword_mese", {
 	description = "Mese Sword",
-	inventory_image = "default_handle_short.png^(default_steelsword.png^[colorize:#FFFF00:152)",
+	inventory_image = "default_tool_mesesword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.7,
 		max_drop_level=1,
@@ -322,7 +320,7 @@ minetest.register_tool("default:sword_mese", {
 })
 minetest.register_tool("default:sword_diamond", {
 	description = "Diamond Sword",
-	inventory_image = "default_handle_short.png^(default_steelsword.png^[colorize:#33FFFF:152)",
+	inventory_image = "default_tool_diamondsword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.7,
 		max_drop_level=1,

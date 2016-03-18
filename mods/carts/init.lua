@@ -65,7 +65,7 @@ local cart = {
 	visual = "mesh",
 	mesh = "cart.x",
 	visual_size = {x=1, y=1},
-	textures = {"cart_top.png^[colorize:#3A5FCD:142", "cart_side.png^[colorize:#3A5FCD:142", "cart_side.png^[colorize:#3A5FCD:142"},
+	textures = {"cart.png"},
 
 	driver = nil,
 
@@ -598,8 +598,8 @@ minetest.register_entity("carts:cart", cart)
 
 minetest.register_craftitem("carts:cart", {
 	description = "Minecart",
-	inventory_image = minetest.inventorycube("cart_top.png^[colorize:#3A5FCD:142", "cart_side.png^[colorize:#3A5FCD:142", "cart_side.png^[colorize:#3A5FCD:142"),
-	wield_image = "cart_side.png^[colorize:#3A5FCD:142",
+	inventory_image = minetest.inventorycube("cart_top.png", "cart_side.png", "cart_side.png"),
+	wield_image = "cart_side.png",
 
 	on_place = function(itemstack, placer, pointed_thing)
 		if not pointed_thing.type == "node" then

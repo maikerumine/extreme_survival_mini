@@ -1,18 +1,7 @@
---esmobs v01.0
+--esmobs v1.3
 --maikerumine
 --made for Extreme Survival game
 --License for code WTFPL
-
-
---ref
---[[
-minetest.register_craftitem("farming:bread", {
-	description = "Bread",
-	inventory_image = "farming_bread.png",
-	on_use = minetest.item_eat(5),
-})
-]]
-
 
 
 -- nametag
@@ -275,6 +264,8 @@ minetest.register_craft({
 	}
 })
 
+
+
 -- shears (right click to shear animal)
 minetest.register_tool("esmobs:shears", {
 	description = "Steel Shears (right-click to shear)",
@@ -309,6 +300,7 @@ minetest.register_craft({
 	{"default:steel_ingot", "", "default:steel_ingot"}
 	},
 })
+
 -- bucket of milk
 minetest.register_craftitem("esmobs:bucket_milk", {
 	description = "Bucket of Milk",
@@ -356,6 +348,7 @@ minetest.register_craft({
 		{'esmobs:cheeseblock'},
 	}
 })
+
 -- cobweb
 minetest.register_node("esmobs:cobweb", {
 	description = "Cobweb",
@@ -385,4 +378,3 @@ minetest.register_craft({
 		{"farming:string", "", "farming:string"},
 	}
 })
-
