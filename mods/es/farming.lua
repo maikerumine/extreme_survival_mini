@@ -1,13 +1,13 @@
--- decoration function
+
 local function register_plant(name, min, max, spawnby, num)
 	minetest.register_decoration({
 		deco_type = "simple",
-		place_on = {"default:dirt_with_grass","es:aiden_grass","es:strange_grass"},
+		place_on = {"es:strange_grass","es:aiden_grass"},
 		sidelen = 16,
 		noise_params = {
 			offset = 0,
 			scale = 0.006,
-			spread = {x = 70, y = 70, z = 70},
+			spread = {x = 60, y = 60, z = 60},
 			seed = 329,
 			octaves = 3,
 			persist = 0.6
@@ -20,7 +20,7 @@ local function register_plant(name, min, max, spawnby, num)
 	})
 end
 
-function farming.register_mgv6_decorations()
+function farming_register_mgv6_decorations()
 	register_plant("potato_3", 15, 40, "", -1)
 	register_plant("tomato_7", 5, 20, "", -1)
 	register_plant("carrot_8", 1, 30, "group:water", 1)
@@ -38,7 +38,7 @@ function farming.register_mgv6_decorations()
 end
 
 -- v7 maps have a beach so plants growing near water is limited to 6 high
-function farming.register_mgv7_decorations()
+function farming_register_mgv7_decorations()
 	register_plant("potato_3", 15, 40, "", -1)
 	register_plant("tomato_7", 5, 20, "", -1)
 	register_plant("carrot_8", 1, 6, "", -1)

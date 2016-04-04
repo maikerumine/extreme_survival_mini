@@ -1,6 +1,7 @@
 --Extreme Survival created by maikerumine
 -- Minetest 0.4.13 mod: "Extreme Survival"
 -- namespace: es
+-- version 1.8
 --https://github.com/maikerumine
 
 --License:
@@ -135,6 +136,7 @@ minetest.register_node("es:stone_with_purpellium", {
 minetest.register_node("es:emeraldblock", {
 	description = "Emerald Block",
 	tiles = {"emerald_block.png"},
+	light_source = 7,
 	is_ground_content = true,
 	groups = {cracky=1,level=2},
 	sounds = default.node_sound_stone_defaults(),
@@ -149,6 +151,7 @@ minetest.register_craftitem("es:emerald_crystal", {
 minetest.register_node("es:rubyblock", {
 	description = "Ruby Block",
 	tiles = {"ruby_block.png"},
+	light_source = 7,
 	is_ground_content = true,
 	groups = {cracky=1,level=2},
 	sounds = default.node_sound_stone_defaults(),
@@ -163,6 +166,7 @@ minetest.register_craftitem("es:ruby_crystal", {
 minetest.register_node("es:aikerumblock", {
 	description = "Aikerum Block",
 	tiles = {"aikerum_block.png"},
+	light_source = 7,
 	is_ground_content = true,
 	groups = {cracky=1,level=2},
 	sounds = default.node_sound_stone_defaults(),
@@ -203,6 +207,7 @@ minetest.register_craftitem("es:infinium_container", {
 minetest.register_node("es:purpelliumblock", {
 	description = "Purpellium Block - Fall from great height without any damage if landing on this block",
 	tiles = {"purpellium_block.png"},
+	light_source = 7,
 	is_ground_content = true,
 	groups = {cracky=1,level=2},
 	sounds = default.node_sound_stone_defaults(),
@@ -508,11 +513,12 @@ end)
 
 
 --CUSTOM biome stuff
+
 minetest.register_node("es:strange_grass", {
 	description = "Strange Grass",
 	tiles = {("default_dry_grass.png^[colorize:#00BBFF:130"),
-		"default_dirt.png",
-		{name = "default_dirt.png^(default_dry_grass_side.png^[colorize:#00BBFF:130)",
+		"default_clay.png",
+		{name = "default_clay.png^(default_dry_grass_side.png^[colorize:#00BBFF:130)",
 			tileable_vertical = false}},
 	groups = {crumbly = 3, soil = 1},
 	drop = 'es:dry_dirt',
@@ -523,9 +529,9 @@ minetest.register_node("es:strange_grass", {
 
 minetest.register_node("es:aiden_grass", {
 	description = "Aiden Grass",
-	tiles = {("default_dry_grass.png^[colorize:#FFBBFF:160"),
-		"default_dirt.png",
-		{name = "default_dirt.png^(default_dry_grass_side.png^[colorize:#FFBBFF:160)",
+	tiles = {("default_dry_grass.png^[colorize:#8A084B:160"),
+		"default_ice.png",
+		{name = "default_ice.png^(default_dry_grass_side.png^[colorize:#FFBBFF:160)",
 			tileable_vertical = false}},
 	groups = {crumbly = 3, soil = 1},
 	drop = 'es:dry_dirt',
@@ -557,21 +563,78 @@ minetest.register_node("es:aiden_tree", {
 	on_place = minetest.rotate_node
 })
 
-minetest.register_node("es:strange_leaves", {
-	description = "Strange Leaves",
-	tiles = {"default_jungleleaves.png^default_dry_shrub.png^[colorize:#0000FF:130"},
-	groups = {snappy = 3},
-	drop = 'default:stick',
-	sounds = default.node_sound_stone_defaults(),
+minetest.register_node("es:old_tree", {
+	description = "Old Tree",
+	tiles = {"default_tree_top.png^[colorize:#585858:170", "default_tree_top.png^[colorize:#585858:170", "default_tree.png^[colorize:#585858:170"},
+	paramtype2 = "facedir",
+	is_ground_content = false,
+	groups = {choppy = 1, flammable = 2},
+	sounds = default.node_sound_wood_defaults(),
+
+	on_place = minetest.rotate_node
 })
 
-minetest.register_node("es:strange_clay", {
+minetest.register_node("es:strange_leaves", {
+	description = "Strange Leaves",
+	drawtype = "plantlike",
+	light_source = 14,
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	tiles = {"default_jungleleaves.png^default_dry_shrub.png^[colorize:#0000FF:170"},
+	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+	drop = {
+		max_items = 1,
+		items = {
+			{
+				-- player will get sapling with 1/20 chance
+				items = {'default:apple'},
+				rarity = 20,
+			},
+			{
+				-- player will get leaves only if he get no saplings,
+				-- this is because max_items is 1
+				items = {'default:stick'},
+			}
+		}
+	},
+	sounds = default.node_sound_stone_defaults(),
+
+	after_place_node = default.after_place_leaves,
+})
+
+minetest.register_node("es:strange_clay_blue", {
 	description = "Strange Clay",
-	tiles = {"default_clay.png^[colorize:#00BBFF:130"},
+	tiles = {"default_clay.png^[colorize:#00BBFF:180"},
 	groups = {crumbly = 3},
 	drop = 'default:clay_lump 4',
 	sounds = default.node_sound_dirt_defaults(),
 })
+
+minetest.register_node("es:strange_clay_red", {
+	description = "Strange Clay Red",
+	tiles = {"default_clay.png^[colorize:#FA5858:180"},
+	groups = {crumbly = 3},
+	drop = 'default:clay_lump 4',
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("es:strange_clay_maroon", {
+	description = "Strange Clay Maroon",
+	tiles = {"default_clay.png^[colorize:#8A0808:180"},
+	groups = {crumbly = 3},
+	drop = 'default:clay_lump 4',
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("es:strange_clay_brown", {
+	description = "Strange Clay Brown",
+	tiles = {"default_clay.png^[colorize:#61210B:180"},
+	groups = {crumbly = 3},
+	drop = 'default:clay_lump 4',
+	sounds = default.node_sound_dirt_defaults(),
+})
+
 --[[
 minetest.register_node("default:dirt_with_dry_grass", {
 	description = "Dirt with Dry Grass",
@@ -587,7 +650,57 @@ minetest.register_node("default:dirt_with_dry_grass", {
 })
 ]]
 
+minetest.register_node("es:dry_shrub", {
+	description = "ES Dry Shrub",
+	drawtype = "plantlike",
+	waving = 1,
+	visual_scale = 1.0,
+	tiles = {"default_dry_shrub.png^[colorize:#00BBFF:180"},
+	inventory_image = "default_dry_shrub.png^[colorize:#00BBFF:180",
+	wield_image = "default_dry_shrub.png^[colorize:#00BBFF:180",
+	paramtype = "light",
+	sunlight_propagates = true,
+--	walkable = false,
+	walkable =true,
+	buildable_to = true,
+	groups = {snappy = 3, flammable = 3, attached_node = 1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5},
+	},
+})
+
+minetest.register_node("es:junglegrass", {
+	description = "ES Jungle Grass",
+	drawtype = "plantlike",
+	waving = 1,
+	visual_scale = 1.3,
+	tiles = {"default_junglegrass.png^[colorize:#8A0808:180"},
+	inventory_image = "default_junglegrass.png^[colorize:#8A0808:180",
+	wield_image = "default_junglegrass.png^[colorize:#8A0808:180",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	buildable_to = true,
+	groups = {snappy = 3, flammable = 2, flora = 1, attached_node = 1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5},
+	},
+})
+
+
+
+
+
+
+
 --Default addons as they should be.  I changed ore generation to keep unique for compatibility.
+
+
+
 
 --Dry dirt added
 minetest.register_node("es:dry_dirt", {
@@ -688,6 +801,7 @@ minetest.register_node("es:toxic_water_source", {
 	diggable = false,
 	buildable_to = true,
 	liquid_renewable = false,
+	liquid_range = 1,
 	is_ground_content = false,
 	drop = "",
 	drowning = 1,
@@ -739,6 +853,7 @@ minetest.register_node("es:toxic_water_flowing", {
 	pointable = false,
 	diggable = false,
 	buildable_to = true,
+	liquid_renewable = false,
 	is_ground_content = false,
 	drop = "",
 	drowning = 1,
@@ -810,6 +925,7 @@ minetest.register_node("es:mud_flowing", {
 	diggable = false,
 	buildable_to = true,
 	is_ground_content = false,
+	liquid_renewable = false,
 	drop = "",
 	drowning = 1,
 	liquidtype = "flowing",
@@ -821,3 +937,96 @@ minetest.register_node("es:mud_flowing", {
 		not_in_creative_inventory = 1, },
 })
 
+--Lava
+minetest.register_node("es:lava_source", {
+	description = "ES Lava Source",
+	drawtype = "liquid",
+	tiles = {
+		{
+			name = "default_lava_source_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.0,
+			},
+		},
+	},
+	special_tiles = {
+		-- New-style lava source material (mostly unused)
+		{
+			name = "default_lava_source_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.0,
+			},
+			backface_culling = false,
+		},
+	},
+	paramtype = "light",
+	light_source = default.LIGHT_MAX - 1,
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	--drowning = 1,
+	liquidtype = "source",
+	liquid_alternative_flowing = "es:lava_flowing",
+	liquid_alternative_source = "es:lava_source",
+	liquid_viscosity = 7,
+	liquid_renewable = false,
+	--damage_per_second = 4 * 2,
+	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
+	groups = {lava = 3, liquid = 2, hot = 3, igniter = 1},
+})
+
+minetest.register_node("es:lava_flowing", {
+	description = "ES Flowing Lava",
+	drawtype = "flowingliquid",
+	tiles = {"default_lava.png"},
+	special_tiles = {
+		{
+			name = "default_lava_flowing_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.3,
+			},
+		},
+		{
+			name = "default_lava_flowing_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.3,
+			},
+		},
+	},
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	light_source = default.LIGHT_MAX - 1,
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	--drowning = 1,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "es:lava_flowing",
+	liquid_alternative_source = "es:lava_source",
+	liquid_viscosity = 7,
+	liquid_renewable = false,
+	--damage_per_second = 4 * 2,
+	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
+	groups = {lava = 3, liquid = 2, hot = 3, igniter = 1,
+		not_in_creative_inventory = 1},
+})
